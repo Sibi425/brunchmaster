@@ -1,20 +1,32 @@
+const path = require('path')
+const User = require(path.join(__dirname + '../../../../models/User.js'))
+
 module.exports = {
-    createAccount(req, res){
-        let Accounts = {
-            "User":{
-                _oid
-            }
-            
-        }
+    createAccount(req, res) {
+        User.findOne()
+            .sort('_oid')
+            .exec(function(err, post) {
+                const Accounts = new User({
+                    _oid: User.findOne()
+                        .sort('_oid')
+                        .exec(function(err, post) {
+                            return post._oid
+                        }),
+                    name: req.body.name
+                })
 
-        Account.UserName = req.body.credentials.UserName;
-        Account.Password = req.body.credentials.Password;
-
-        const fs = require('fs');
-        fs.appendFile("Accounts.json", JSON.stringify(Account), () => {
-            console.log("Da tut sich was.")
-            res.send(JSON.stringify(Account))
-        })
-
+                console.log(Accounts)
+                Accounts.save()
+                    .then(data => {
+                        res.send(data)
+                    })
+                    .catch(err => {
+                        res.status(500).send({
+                            message:
+                                err.message ||
+                                'An error occurred while creating the Account.'
+                        })
+                    })
+            })
     }
 }
